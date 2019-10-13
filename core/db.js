@@ -31,10 +31,17 @@ const sequelize = new Sequelize(dbName,user,password,{
         // create_time  update_time   delete_time
         timestamps: true,
         paranoid: true,
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-        deletedAt: 'deleted_at',
-        underscored:true
+        // createdAt: 'created_at',
+        // updatedAt: 'updated_at',
+        // deletedAt: 'deleted_at',
+        underscored:true,  // 驼峰命名 -> 下划线
+        scopes: {
+            bh: {
+                attributes: {
+                    exclude: ['updatedAt', 'deletedAt', 'createdAt']
+                }
+            }
+        }
     }
 })
 
