@@ -1,7 +1,26 @@
 const { sequelize } = require('./../../core/db')
 const { Model, Sequelize } = require('sequelize')
+const { NotFound } = require('../../core/http-exception')
+const { Art } = require('./../models/art')
+const { Favor } = require('./../models/Favor')
 
 class Flow extends Model {
+    static async getNextOrPrevous (index, uid) {
+        const flow = await Flow.findOne({
+            where: {
+                index
+            }
+        })
+
+        if (!flow) {
+            throw new NotFound()
+        }
+        const art = await Art.getData(flow.art_id,flow.type)
+        const likeNext = await Favor.userLikeIt(flow.art_id,flow.type, uid)
+        art.setDataValue('index',flow.index)
+        art.setDataValue('like_status',likeNext)
+        return art
+    }
 
 }
 // 业务表

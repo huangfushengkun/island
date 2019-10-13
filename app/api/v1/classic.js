@@ -29,5 +29,17 @@ router.get('/latest',new Auth().m, async (ctx, next) => {
 
 })
 
+router.get('/:index/next',new Auth().m, async (ctx) => {
+    const v = await new PositiveIntegerValidator().validate(ctx, {id: 'index'})
+    const index = v.get('path.index')
+    const art = await Flow.getNextOrPrevous(index+1, ctx.auth.uid)
+    ctx.body = art
+})
+router.get('/:index/pervous',new Auth().m, async (ctx) => {
+    const v = await new PositiveIntegerValidator().validate(ctx, {id: 'index'})
+    const index = v.get('path.index')
+    const art = await Flow.getNextOrPrevous(index-1, ctx.auth.uid)
+    ctx.body = art
+})
 // 面向对象 model class
 module.exports = router

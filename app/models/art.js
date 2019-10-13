@@ -12,6 +12,7 @@ class Art {
                 id:art_id
             }
         }
+        const scope = useScope ? 'bh' : null
         switch (type) {
             case 100:
                 art = await Movie.scope(scope).findOne(finder)
