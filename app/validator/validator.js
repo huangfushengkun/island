@@ -5,7 +5,7 @@ const {
 
 const { User } = require('./../models/user')
 
-const { LoginType } = require('./../lib/enum')
+const { LoginType,ArtType } = require('./../lib/enum')
 class PositiveIntegerValidator extends LinValidator {
 
     constructor() {
@@ -99,11 +99,46 @@ class NotEmptyValidator extends LinValidator {
 }
 
 function checkType(vals) {
-    if (!vals.body.type) {
+    let type = vals.body.type || vals.path.type
+    if (!type) {
         throw new Error("type是必传参数")
     }
-    if (!LoginType.isThisType(vals.body.type)) {
+    type = parseInt(type)
+    // this.parsed.path.type = type  保存变量 this指代 ClassicValidator 继承了 lin-validator
+    // this.parsed.default.type 不用区分type 是path body
+    if (!LoginType.isThisType(type)) {
         throw new Error('type参数不合法')
+    }
+}
+
+function checkArtType(vals) {
+    let type = vals.body.type || vals.path.type
+    if (!type) {
+        throw new Error("type是必传参数")
+    }
+    type = parseInt(type)
+    // this.parsed.path.type = type  保存变量 this指代 ClassicValidator 继承了 lin-validator
+    // this.parsed.default.type 不用区分type 是path body
+    if (!ArtType.isThisType(type)) {
+        throw new Error('type参数不合法')
+    }
+}
+
+class Checker  {
+    constructor (type) {
+        this.enumType = type
+    }
+    check(vals) {
+        let type = vals.body.type || vals.path.type
+        if (!type) {
+            throw new Error("type是必传参数")
+        }
+        type = parseInt(type)
+        // this.parsed.path.type = type  保存变量 this指代 ClassicValidator 继承了 lin-validator
+        // this.parsed.default.type 不用区分type 是path body
+        if (!this.enumType.isThisType(type)) {
+            throw new Error('type参数不合法')
+        }
     }
 }
 
@@ -111,8 +146,15 @@ function checkType(vals) {
 class LikeValidator extends LinValidator{
     constructor() {
         super()
-        this.validateType = checkType
+        this.validateType = checkArtType
+
+        // const checker = new Checker(ArtType)
+        // this.validateType = checker.check.bind(checker)
     }
+}
+
+class ClassicValidator extends LikeValidator {
+
 }
 
 
@@ -121,5 +163,6 @@ module.exports = {
     RegisteerValidator,
     TokenValidator,
     NotEmptyValidator,
-    LikeValidator
+    LikeValidator,
+    ClassicValidator
 }

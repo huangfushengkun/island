@@ -4,8 +4,8 @@ const router = new Router({
 })
 const { Flow } = require('./../../models/flow')
 
-const { PositiveIntegerValidator } = require('../../validator/validator')
-const { HttpException } = require('../../../core/http-exception')
+const { PositiveIntegerValidator, ClassicValidator } = require('../../validator/validator')
+const { HttpException,NotFound } = require('../../../core/http-exception')
 const { Art } = require('./../../models/art')
 const { Auth } = require('./../../../middlewares/auth')
 const { Favor } = require('./../../models/favor')
@@ -28,18 +28,34 @@ router.get('/latest',new Auth().m, async (ctx, next) => {
     ctx.body = art
 
 })
-
+/* 获取下一期期刊信息 */
 router.get('/:index/next',new Auth().m, async (ctx) => {
     const v = await new PositiveIntegerValidator().validate(ctx, {id: 'index'})
     const index = v.get('path.index')
     const art = await Flow.getNextOrPrevous(index+1, ctx.auth.uid)
     ctx.body = art
 })
+/* 获取上一期期刊信息 */
 router.get('/:index/pervous',new Auth().m, async (ctx) => {
     const v = await new PositiveIntegerValidator().validate(ctx, {id: 'index'})
     const index = v.get('path.index')
     const art = await Flow.getNextOrPrevous(index-1, ctx.auth.uid)
     ctx.body = art
+})
+/* 获取某一期期刊的详细信息 */
+router.get('/:type/:id/favor', new Auth().m, async ctx => {
+    const v = await new ClassicValidator().validate(ctx)
+    const type = parseInt(v.get('path.type'))
+    const id = v.get('path.id')
+    const art = await Art.getData(id,type)
+    if (!art) {
+        throw new NotFound()
+    }
+    const like = await Favor.userLikeIt(id,type,ctx.auth.uid)
+    ctx.body = {
+        fav_nums: art.fav_nums,
+        like_status: like
+    }
 })
 // 面向对象 model class
 module.exports = router
