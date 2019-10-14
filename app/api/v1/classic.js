@@ -57,5 +57,12 @@ router.get('/:type/:id/favor', new Auth().m, async ctx => {
         like_status: like
     }
 })
+
+/* 获取用户喜欢的期刊列表 */
+router.get('/favor', new Auth().m, async ctx => {
+    const uid = ctx.auth.uid
+    const like = await Favor.getMyfavorList(uid)
+    ctx.body = like
+})
 // 面向对象 model class
 module.exports = router

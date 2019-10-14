@@ -1,8 +1,8 @@
-const { Model, Sequelize } = require('sequelize')
+const { Model, Sequelize,Op } = require('sequelize')
 
 const { sequelize } = require('./../../core/db')
 const { Art } = require('./../models/art')
-const { LikeError,DislikeError } = require('./../../core/http-exception')
+const { LikeError,DislikeError,NotFound } = require('./../../core/http-exception')
 /* 业务表 */
 class Favor extends Model {
     static async like (art_id,type,uid) {
@@ -58,6 +58,21 @@ class Favor extends Model {
             where: {art_id,type,uid}
         })
         return favor ? true : false
+    }
+
+    static async getMyfavorList (uid) {
+        const arts = await Favor.findAll({
+            where: {
+                uid,
+                type:{
+                    [Op.not]:400 //表示type!==400  查询期刊列表 排出喜欢的书籍类型 [a+b]里面是表达式会带入计算
+                }
+            }
+        })
+        if (!arts) {
+            throw new NotFound()
+        }
+        return await Art.getList(arts)
     }
 }
 Favor.init({
