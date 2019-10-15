@@ -1,13 +1,35 @@
+const { flatten } = require('lodash')
+const { Op } = require('sequelize')
 
 const {
     Movie,
     Sentence,
     Music
-} = require('../models/classic')
-const { Op } = require('sequelize')
+} = require('./classic')
 
-const { flatten } = require('lodash')
+const { HttpException, NotFound } = require('./../../core/http-exception')
 class Art {
+
+    constructor (art_id, type) {
+        this.art_id = art_id
+        this.type = type
+    }
+
+    async getDetail (uid) {
+        const { Favor } = require('./favor')
+        const art = await Art.getData(this.art_id, this.type)
+        if (!art) {
+            throw new NotFound()
+        }
+        const like = await Favor.userLikeIt(this.art_id, this.type, uid)
+        // art.setDataValue('like_status',like)
+        // return art
+        return {
+            art,
+            like_status: like
+        }
+    }
+
     static async getList (artInfoList) {
         // 3中类型 art
         // 3次 in查询
