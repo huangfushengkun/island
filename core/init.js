@@ -10,6 +10,7 @@ class InitManager {
         InitManager.initLoadRouters()
         InitManager.loadConfig()
     }
+    /* 配置文件全局化 */
     static loadConfig(path = '') {
         const configPath = path || process.cwd() + '/config/config.js'
         const config = require(configPath)

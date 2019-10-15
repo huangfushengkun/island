@@ -16,5 +16,9 @@ module.exports = {
         appSecret: 'a27e96c0651170c131b886b115e55af2', //同上
         /* 获取openId的模板URL 注意占位符%s */
         loginUrl: 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'
+    },
+    yushu: {
+        detailUrl: 'http://t.yushu.im/v2/book/id/%s',
+        keywordUrl: 'http://t.yushu.im/v2/book/search?q=%s&count=%s&start=%s&summary=%s'
     }
 }
