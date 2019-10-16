@@ -1,9 +1,15 @@
 const Router = require('koa-router')  //引入koa router
 const { HotBook } = require('./../../models/hot-book')
 const { Book } = require('./../../models/book')
+const { Comment } = require('./../../models/book_comment')
 const { Favor } = require('./../../models/favor')
-const { PositiveIntegerValidator,SeachValidator } = require('./../../validator/validator')
+const { 
+    PositiveIntegerValidator,
+    SeachValidator,
+    AddShortCommentValidator
+} = require('./../../validator/validator')
 const { Auth } = require('./../../../middlewares/auth')
+const { success } = require('./../../lib/helper')
 const router = new Router({
     prefix: '/v1/book'
 })
@@ -44,6 +50,12 @@ router.get('/:book_id/favor', new Auth().m, async ctx => {
     ctx.body = favor
 })
 
-
-
+/* 增加短评接口 */
+router.post('/add/short_comment', new Auth().m, async ctx => {
+    const v = await new AddShortCommentValidator().validate(ctx, {
+        id:'book_id'
+    })
+    Comment.addCommment(v.get('body.book_id'),v.get('body.content'))
+    success()
+})
 module.exports = router
