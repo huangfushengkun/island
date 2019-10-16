@@ -74,6 +74,27 @@ class Favor extends Model {
         }
         return await Art.getList(arts)
     }
+
+    static async getBookFavor (uid,bookId) {
+        const count = await Favor.count({
+            where:{
+                type:400,
+                art_id:bookId
+            }
+        })
+        const myFavor = await Favor.findOne({
+            where:{
+                type:400,
+                art_id:bookId,
+                uid,
+            }
+        })
+
+        return {
+            fav_nums:count,
+            like_status:myFavor ? 1 : 0
+        }
+    }
 }
 Favor.init({
     uid:Sequelize.INTEGER,
