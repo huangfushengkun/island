@@ -14,17 +14,17 @@ const router = new Router({
     prefix: '/v1/book'
 })
 /* 获取热门书籍列表 */
-router.get('/host_list', async (ctx, next) => {
+router.get('/hot_list', async (ctx, next) => {
     const books = await HotBook.getAll()
-    ctx.body = {books: books}
+    ctx.body = books
 })
 /* 获取书籍的详细信息 */
 router.get('/:id/detail', async (ctx, next) => {
     const v = await new PositiveIntegerValidator().validate(ctx)
     
-    const book = new Book(v.get('path.id'))
+    const book = new Book()
     
-    ctx.body = await book.detail()
+    ctx.body = await book.detail(v.get('path.id'))
 })
 /* 搜索接口 */
 router.get('/search', async (ctx, next) => {
@@ -58,4 +58,17 @@ router.post('/add/short_comment', new Auth().m, async ctx => {
     Comment.addCommment(v.get('body.book_id'),v.get('body.content'))
     success()
 })
+/* 短评查询 */
+router.get('/:book_id/short_comment', new Auth().m, async ctx => {
+    const v = await new PositiveIntegerValidator().validate(ctx, {
+        id: 'book_id' //传入验证器别名
+    })
+    const book_id = v.get('path.book_id')
+    const comments = await Comment.getComments(book_id)
+    ctx.body = {
+        comments,
+        book_id
+    }
+})
+
 module.exports = router

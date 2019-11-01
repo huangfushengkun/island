@@ -38,7 +38,7 @@ class HotBook extends Model {
                 count = favor.get('count')
             }
         })
-        book.setDataValue('count',count)
+        book.setDataValue('fav_nums',count)
         return book
     }
 }
